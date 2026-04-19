@@ -6,7 +6,7 @@ AI study assistant that generates summaries, flashcards, and quizzes from upload
 ## Tech Stack
 - **Backend:** FastAPI (Python 3.11+, async) + PostgreSQL + Redis + Alembic
 - **Frontend:** React 18 + TypeScript + Vite
-- **LLM:** OpenAI GPT-4o (primary) + Ollama (local dev alternative)
+- **LLM:** GLM-4.5 (Zhipu AI, default) or any OpenAI-compatible API
 - **Infra:** Docker Compose → Azure App Service
 
 ## Current Phase

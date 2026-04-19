@@ -36,7 +36,7 @@ async def stream_summarize(
         file_id=request.file_id,
         mode="summarize",
         prompt_template="summarize.j2",
-        model_name=settings.OPENAI_MODEL,
+        model_name=settings.LLM_MODEL,
         status="pending",
         started_at=datetime.now(timezone.utc),
     )
@@ -45,7 +45,11 @@ async def stream_summarize(
     await db.refresh(session_record)
 
     async def event_generator():
-        llm = LLMService(api_key=settings.OPENAI_API_KEY, model=settings.OPENAI_MODEL)
+        llm = LLMService(
+                api_key=settings.LLM_API_KEY,
+                model=settings.LLM_MODEL,
+                base_url=settings.LLM_BASE_URL or None,
+            )
 
         try:
             session_record.status = "streaming"

@@ -6,13 +6,9 @@ class Settings(BaseSettings):
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
 
-    OPENAI_API_KEY: str = ""
-    OPENAI_MODEL: str = "gpt-4o"
-
-    OLLAMA_BASE_URL: str = "http://localhost:11434/v1"
-    OLLAMA_MODEL: str = "llama3.2"
-
-    LLM_PROVIDER: str = "openai"
+    LLM_API_KEY: str = ""
+    LLM_BASE_URL: str = "https://api.z.ai/api/coding/paas/v4"
+    LLM_MODEL: str = "glm-4.5"
 
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@db:5432/studyassistant"
     REDIS_URL: str = "redis://redis:6379/0"

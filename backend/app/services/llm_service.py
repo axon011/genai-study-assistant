@@ -6,12 +6,14 @@ from openai import AsyncOpenAI
 MODEL_PRICING = {
     "gpt-4o": {"input": 2.50 / 1_000_000, "output": 10.00 / 1_000_000},
     "gpt-4o-mini": {"input": 0.15 / 1_000_000, "output": 0.60 / 1_000_000},
+    "glm-4.5": {"input": 0.50 / 1_000_000, "output": 1.00 / 1_000_000},
+    "glm-4": {"input": 0.50 / 1_000_000, "output": 1.00 / 1_000_000},
 }
 
 
 class LLMService:
-    def __init__(self, api_key: str, model: str = "gpt-4o") -> None:
-        self.client = AsyncOpenAI(api_key=api_key)
+    def __init__(self, api_key: str, model: str = "glm-4.5", base_url: str | None = None) -> None:
+        self.client = AsyncOpenAI(api_key=api_key, base_url=base_url)
         self.model = model
         try:
             self.encoder = tiktoken.encoding_for_model(model)
@@ -33,12 +35,16 @@ class LLMService:
         output_tokens = 0
         full_response = ""
 
-        stream = await self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            stream=True,
-            stream_options={"include_usage": True},
-        )
+        create_kwargs: dict = {
+            "model": self.model,
+            "messages": messages,
+            "stream": True,
+        }
+        is_openai = not self.client.base_url or "openai.com" in str(self.client.base_url)
+        if is_openai:
+            create_kwargs["stream_options"] = {"include_usage": True}
+
+        stream = await self.client.chat.completions.create(**create_kwargs)
 
         async for chunk in stream:
             if chunk.choices and chunk.choices[0].delta.content:
