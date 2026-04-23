@@ -1,0 +1,16 @@
+Generate exactly {{ num_cards }} flashcards from the study material below.
+Use ONLY information present in the provided context.
+
+Difficulty: {{ difficulty }}
+{% if custom_instructions %}
+Additional instructions: {{ custom_instructions }}
+{% endif %}
+
+Return only a JSON array. Each item must follow this shape:
+{
+  "question": "clear question",
+  "answer": "concise, correct answer"
+}
+
+Study material:
+{{ text }}

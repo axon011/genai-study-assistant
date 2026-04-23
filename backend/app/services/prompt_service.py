@@ -10,6 +10,16 @@ SYSTEM_PROMPTS = {
         "Preserve important definitions, formulas, and examples. "
         "Be thorough but concise."
     ),
+    "flashcard": (
+        "You are an expert academic tutor and study assistant. "
+        "Generate study flashcards from the provided material. "
+        "Return only valid JSON with no markdown fences or extra text."
+    ),
+    "quiz": (
+        "You are an expert academic tutor and study assistant. "
+        "Generate a study quiz from the provided material. "
+        "Return only valid JSON with no markdown fences or extra text."
+    ),
 }
 
 
@@ -25,14 +35,14 @@ class PromptService:
         self,
         mode: str,
         text: str,
-        custom_instructions: str | None = None,
+        **context: str | int | list[str] | None,
     ) -> list[dict[str, str]]:
         system_prompt = SYSTEM_PROMPTS.get(mode)
         if not system_prompt:
             raise ValueError(f"Unknown mode: {mode}")
 
         template = self.env.get_template(f"{mode}.j2")
-        user_content = template.render(text=text, custom_instructions=custom_instructions)
+        user_content = template.render(text=text, **context)
 
         return [
             {"role": "system", "content": system_prompt},

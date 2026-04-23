@@ -1,0 +1,34 @@
+Generate exactly {{ num_questions }} quiz questions from the study material below.
+Use ONLY information present in the provided context.
+
+Question types to include: {{ question_types | join(", ") }}
+{% if custom_instructions %}
+Additional instructions: {{ custom_instructions }}
+{% endif %}
+
+Return only valid JSON with this exact top-level shape:
+{
+  "questions": [
+    {
+      "type": "mcq",
+      "question": "question text",
+      "options": [
+        { "id": "A", "text": "option text" },
+        { "id": "B", "text": "option text" },
+        { "id": "C", "text": "option text" },
+        { "id": "D", "text": "option text" }
+      ],
+      "correct_answer": "A",
+      "explanation": "brief explanation"
+    },
+    {
+      "type": "short_answer",
+      "question": "question text",
+      "acceptable_answers": ["answer one", "answer two"],
+      "explanation": "brief explanation"
+    }
+  ]
+}
+
+Study material:
+{{ text }}

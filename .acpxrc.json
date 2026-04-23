@@ -1,0 +1,17 @@
+{
+  "defaultAgent": "claude",
+  "sessions": {
+    "timeout": 600,
+    "autoReconnect": true
+  },
+  "agents": {
+    "claude": {
+      "command": "claude",
+      "args": ["--print", "--dangerously-skip-permissions"]
+    },
+    "codex": {
+      "command": "codex",
+      "args": ["--full-auto"]
+    }
+  }
+}

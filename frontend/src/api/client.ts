@@ -1,5 +1,13 @@
 import { API_BASE_URL } from "../config";
-import type { FileUploadResponse, SummarizeRequest, SSEEvent } from "../types/api";
+import type {
+  FileUploadResponse,
+  FlashcardRequest,
+  QuizRequest,
+  SessionDetail,
+  SessionListResponse,
+  SSEEvent,
+  SummarizeRequest,
+} from "../types/api";
 
 export async function uploadFile(file: File): Promise<FileUploadResponse> {
   const formData = new FormData();
@@ -18,10 +26,11 @@ export async function uploadFile(file: File): Promise<FileUploadResponse> {
   return response.json();
 }
 
-export async function* streamSummarize(
-  request: SummarizeRequest
+async function* streamRequest(
+  path: string,
+  request: SummarizeRequest | FlashcardRequest | QuizRequest
 ): AsyncGenerator<SSEEvent> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/stream-summarize`, {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(request),
@@ -32,13 +41,19 @@ export async function* streamSummarize(
     throw new Error(err.detail || "Stream request failed");
   }
 
-  const reader = response.body!.getReader();
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new Error("Streaming is not supported in this browser");
+  }
+
   const decoder = new TextDecoder();
   let buffer = "";
 
   while (true) {
     const { done, value } = await reader.read();
-    if (done) break;
+    if (done) {
+      break;
+    }
 
     buffer += decoder.decode(value, { stream: true });
     const lines = buffer.split("\n");
@@ -54,5 +69,60 @@ export async function* streamSummarize(
         currentEvent = "";
       }
     }
+  }
+}
+
+export async function* streamSummarize(
+  request: SummarizeRequest
+): AsyncGenerator<SSEEvent> {
+  yield* streamRequest("/api/v1/stream-summarize", request);
+}
+
+export async function* streamFlashcards(
+  request: FlashcardRequest
+): AsyncGenerator<SSEEvent> {
+  yield* streamRequest("/api/v1/stream-flashcards", request);
+}
+
+export async function* streamQuiz(
+  request: QuizRequest
+): AsyncGenerator<SSEEvent> {
+  yield* streamRequest("/api/v1/stream-quiz", request);
+}
+
+export async function fetchSessions(
+  page = 1,
+  pageSize = 20
+): Promise<SessionListResponse> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/sessions?page=${page}&page_size=${pageSize}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to load session history");
+  }
+
+  return response.json();
+}
+
+export async function fetchSessionDetail(sessionId: string): Promise<SessionDetail> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/sessions/${sessionId}`);
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ detail: "Failed to load session" }));
+    throw new Error(err.detail || "Failed to load session");
+  }
+
+  return response.json();
+}
+
+export async function deleteSession(sessionId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/sessions/${sessionId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ detail: "Failed to delete session" }));
+    throw new Error(err.detail || "Failed to delete session");
   }
 }

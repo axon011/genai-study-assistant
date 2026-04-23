@@ -32,6 +32,9 @@ class Session(TimestampMixin, Base):
     completed_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     user: Mapped["User | None"] = relationship(back_populates="sessions")
     file: Mapped["File"] = relationship(back_populates="sessions")

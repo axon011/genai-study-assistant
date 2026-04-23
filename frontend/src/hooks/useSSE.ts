@@ -1,8 +1,15 @@
 import { useState } from "react";
-import { streamSummarize } from "../api/client";
-import type { SummarizeRequest, StreamCompleteEvent } from "../types/api";
+import { streamFlashcards, streamQuiz, streamSummarize } from "../api/client";
+import type {
+  FlashcardRequest,
+  QuizRequest,
+  StreamCompleteEvent,
+  StudyMode,
+  SummarizeRequest,
+} from "../types/api";
 
 type StreamStatus = "idle" | "streaming" | "complete" | "error";
+type StreamRequest = SummarizeRequest | FlashcardRequest | QuizRequest;
 
 export function useSSE() {
   const [status, setStatus] = useState<StreamStatus>("idle");
@@ -10,14 +17,21 @@ export function useSSE() {
   const [tokenInfo, setTokenInfo] = useState<StreamCompleteEvent | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const startStream = async (request: SummarizeRequest) => {
+  const startStream = async (mode: StudyMode, request: StreamRequest) => {
     setStatus("streaming");
     setContent("");
     setTokenInfo(null);
     setError(null);
 
     try {
-      for await (const event of streamSummarize(request)) {
+      const stream =
+        mode === "summarize"
+          ? streamSummarize(request as SummarizeRequest)
+          : mode === "flashcards"
+            ? streamFlashcards(request as FlashcardRequest)
+            : streamQuiz(request as QuizRequest);
+
+      for await (const event of stream) {
         if (event._event === "stream") {
           setContent((prev) => prev + event.chunk);
         } else if (event._event === "complete") {
@@ -28,6 +42,7 @@ export function useSSE() {
           setStatus("error");
         }
       }
+
       setStatus((prev) => (prev === "streaming" ? "complete" : prev));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Streaming failed");

@@ -8,7 +8,10 @@ from app.api.schemas.upload import FileUploadResponse
 from app.config import settings
 from app.database import get_db
 from app.models.file import File as FileModel
+from app.services.chunking_service import ChunkingService
 from app.services.file_extractor import FileExtractorService
+from app.services.rate_limiter import upload_rate_limit
+from app.services.vector_store import VectorStoreService
 
 router = APIRouter(prefix="/api/v1", tags=["upload"])
 
@@ -16,6 +19,7 @@ router = APIRouter(prefix="/api/v1", tags=["upload"])
 @router.post("/upload", response_model=FileUploadResponse, status_code=201)
 async def upload_file(
     file: UploadFile = File(...),
+    _: None = Depends(upload_rate_limit),
     db: AsyncSession = Depends(get_db),
 ):
     try:
@@ -66,6 +70,19 @@ async def upload_file(
 
     if status == "error":
         raise HTTPException(status_code=422, detail=f"Text extraction failed: {error_message}")
+
+    # RAG: chunk text and store embeddings in ChromaDB
+    try:
+        chunker = ChunkingService()
+        chunks = chunker.chunk_text(
+            text=extracted_text,
+            file_id=str(file_id),
+            filename=file.filename,
+        )
+        vector_store = VectorStoreService()
+        vector_store.add_chunks(chunks)
+    except Exception:
+        pass  # non-fatal: RAG search degrades but basic mode still works
 
     return FileUploadResponse(
         file_id=file_record.id,

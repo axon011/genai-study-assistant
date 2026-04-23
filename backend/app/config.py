@@ -16,5 +16,13 @@ class Settings(BaseSettings):
     MAX_FILE_SIZE_MB: int = 50
     ALLOWED_FILE_TYPES: list[str] = ["pdf", "txt", "md"]
 
+    CHROMA_HOST: str = "chromadb"
+    CHROMA_PORT: int = 8000
+    CHUNK_SIZE: int = 500
+    CHUNK_OVERLAP: int = 100
+    EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
+    RETRIEVAL_TOP_K: int = 8
+    RERANK_TOP_K: int = 5
+
 
 settings = Settings()
