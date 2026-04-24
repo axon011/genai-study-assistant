@@ -142,52 +142,97 @@ body {
 .app-shell .app { flex: 1; min-width: 0; }
 
 /* Session History Sidebar */
-[role="complementary"],
-.session-sidebar {
-  width: 260px;
-  min-width: 260px;
+.history-sidebar {
+  width: 280px;
+  min-width: 280px;
   background: var(--surface);
   border-right: 1px solid var(--border);
-  padding: 1.25rem 1rem;
+  padding: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
 }
-.session-sidebar h2,
-[role="complementary"] h2 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; }
-
-.session-item {
+.history-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.65rem;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 1;
+}
+.history-header h2 { font-size: 0.95rem; font-weight: 700; margin: 0; }
+.history-header span { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; background: var(--bg); padding: 0.15rem 0.5rem; border-radius: 999px; }
+
+.history-list {
+  flex: 1;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
   border-radius: 8px;
-  border: 1px solid transparent;
+  transition: background 0.15s;
+  position: relative;
+}
+.history-item:hover { background: var(--bg); }
+.history-item.selected { background: #eff6ff; }
+
+.history-select {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.6rem 0.75rem;
+  border: none;
+  background: none;
   cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.15s;
   text-align: left;
-  width: 100%;
-  background: transparent;
+  min-width: 0;
   color: var(--text);
 }
-.session-item:hover { background: var(--bg); border-color: var(--border); }
-.session-item.active { background: #eff6ff; border-color: var(--primary); color: var(--primary); }
-.session-item .delete-btn {
-  margin-left: auto;
+.history-mode {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--primary);
+}
+.history-file {
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.history-meta {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.history-delete {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
   color: var(--text-muted);
-  font-size: 0.75rem;
-  padding: 2px 6px;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.4rem;
   border-radius: 4px;
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: all 0.15s;
 }
-.session-item:hover .delete-btn { opacity: 1; }
-.session-item .delete-btn:hover { background: #fef2f2; color: var(--error); }
+.history-item:hover .history-delete { opacity: 1; }
+.history-delete:hover { background: #fef2f2; color: var(--error); }
 
 /* ── Mode Tabs ── */
 .mode-tabs { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
