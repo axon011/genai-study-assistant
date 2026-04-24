@@ -1,8 +1,10 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { fetchFiles } from "../api/client";
 import type { FileUploadResponse } from "../types/api";
 
 interface Props {
   onUpload: (file: File) => void;
+  onSelectExisting: (file: FileUploadResponse) => void;
   uploadState: "idle" | "uploading" | "success" | "error";
   fileData: FileUploadResponse | null;
   error: string | null;
@@ -15,9 +17,17 @@ function formatBytes(bytes: number): string {
   return `${bytes} B`;
 }
 
-export function FileUpload({ onUpload, uploadState, fileData, error, onReset }: Props) {
+export function FileUpload({ onUpload, onSelectExisting, uploadState, fileData, error, onReset }: Props) {
   const [isDragging, setIsDragging] = useState(false);
+  const [existingFiles, setExistingFiles] = useState<FileUploadResponse[]>([]);
+  const [showExisting, setShowExisting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    fetchFiles()
+      .then(setExistingFiles)
+      .catch(() => {});
+  }, []);
 
   const handleFile = useCallback(
     (file: File) => {
@@ -62,8 +72,8 @@ export function FileUpload({ onUpload, uploadState, fileData, error, onReset }: 
             <p className="preview-text">{fileData.text_preview}</p>
           </div>
         )}
-        <button className="btn-secondary" onClick={onReset}>
-          Upload different file
+        <button className="btn-secondary" onClick={onReset} type="button">
+          Choose different file
         </button>
       </div>
     );
@@ -100,6 +110,41 @@ export function FileUpload({ onUpload, uploadState, fileData, error, onReset }: 
           </>
         )}
       </div>
+
+      {existingFiles.length > 0 && (
+        <div className="existing-files">
+          <button
+            className="existing-toggle"
+            onClick={() => setShowExisting(!showExisting)}
+            type="button"
+          >
+            {showExisting ? "Hide" : "Or choose from"} {existingFiles.length} previously uploaded file{existingFiles.length !== 1 ? "s" : ""}
+            <span className="toggle-arrow">{showExisting ? "▲" : "▼"}</span>
+          </button>
+
+          {showExisting && (
+            <div className="existing-list">
+              {existingFiles.map((f) => (
+                <button
+                  className="existing-item"
+                  key={f.file_id}
+                  onClick={() => onSelectExisting(f)}
+                  type="button"
+                >
+                  <span className="existing-icon">📄</span>
+                  <div className="existing-info">
+                    <span className="existing-name">{f.original_filename}</span>
+                    <span className="existing-meta">
+                      {formatBytes(f.file_size_bytes)} &middot; {f.char_count?.toLocaleString()} chars &middot; {new Date(f.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {error && <p className="error-text">{error}</p>}
     </div>
   );

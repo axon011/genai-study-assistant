@@ -22,11 +22,17 @@ export function useUpload() {
     }
   };
 
+  const selectExisting = (file: FileUploadResponse) => {
+    setData(file);
+    setState("success");
+    setError(null);
+  };
+
   const reset = () => {
     setState("idle");
     setData(null);
     setError(null);
   };
 
-  return { state, data, error, upload, reset };
+  return { state, data, error, upload, selectExisting, reset };
 }

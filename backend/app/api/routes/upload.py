@@ -2,6 +2,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.schemas.upload import FileUploadResponse
@@ -12,6 +13,29 @@ from app.services.file_extractor import FileExtractorService
 from app.services.rate_limiter import upload_rate_limit
 
 router = APIRouter(prefix="/api/v1", tags=["upload"])
+
+
+@router.get("/files", response_model=list[FileUploadResponse])
+async def list_files(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(
+        select(FileModel)
+        .where(FileModel.status == "ready")
+        .order_by(FileModel.created_at.desc())
+        .limit(50)
+    )
+    return [
+        FileUploadResponse(
+            file_id=f.id,
+            original_filename=f.original_filename,
+            file_type=f.file_type,
+            file_size_bytes=f.file_size_bytes,
+            char_count=f.char_count,
+            text_preview=f.text_preview,
+            status=f.status,
+            created_at=f.created_at,
+        )
+        for f in result.scalars().all()
+    ]
 
 
 @router.post("/upload", response_model=FileUploadResponse, status_code=201)

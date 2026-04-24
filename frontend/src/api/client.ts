@@ -13,6 +13,12 @@ import type {
   SummarizeRequest,
 } from "../types/api";
 
+export async function fetchFiles(): Promise<FileUploadResponse[]> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/files`);
+  if (!response.ok) throw new Error("Failed to load files");
+  return response.json();
+}
+
 export async function uploadFile(file: File): Promise<FileUploadResponse> {
   const formData = new FormData();
   formData.append("file", file);

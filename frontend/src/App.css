@@ -134,6 +134,57 @@ body {
 @keyframes spin { to { transform: rotate(360deg); } }
 .upload-progress { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; color: var(--text-muted); }
 
+/* Existing files picker */
+.existing-files { margin-top: 0.75rem; }
+.existing-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.existing-toggle:hover { color: var(--primary-hover); }
+.toggle-arrow { font-size: 0.6rem; }
+
+.existing-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 0.5rem;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.4rem;
+}
+.existing-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  width: 100%;
+  color: var(--text);
+}
+.existing-item:hover { background: var(--bg); border-color: var(--border); }
+.existing-icon { font-size: 1.25rem; flex-shrink: 0; }
+.existing-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.existing-name { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.existing-meta { font-size: 0.7rem; color: var(--text-muted); }
+
 .error-text { color: var(--error); font-size: 0.9rem; font-weight: 500; margin-top: 0.5rem; }
 .footer { text-align: center; padding: 2rem 0 1rem; color: var(--text-muted); font-size: 0.8rem; }
 

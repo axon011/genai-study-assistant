@@ -84,6 +84,7 @@ function App() {
     data: fileData,
     error: uploadError,
     upload,
+    selectExisting,
     reset: resetUpload,
   } = useUpload();
   const {
@@ -263,6 +264,7 @@ function App() {
         <main className="main">
           <FileUpload
             onUpload={upload}
+            onSelectExisting={selectExisting}
             uploadState={uploadState}
             fileData={fileData}
             error={uploadError}
