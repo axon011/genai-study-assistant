@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import logging
+from typing import Any
 
 import chromadb
 from sentence_transformers import SentenceTransformer
@@ -8,7 +11,7 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 _model: SentenceTransformer | None = None
-_client: chromadb.HttpClient | None = None
+_client: Any = None
 
 
 def get_embedding_model() -> SentenceTransformer:

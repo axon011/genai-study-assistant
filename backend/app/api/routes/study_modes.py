@@ -14,8 +14,6 @@ from app.models.session import Session
 from app.services.llm_service import LLMService
 from app.services.prompt_service import PromptService
 from app.services.rate_limiter import generation_rate_limit
-from app.services.reranker import RerankerService
-from app.services.vector_store import VectorStoreService
 
 router = APIRouter(prefix="/api/v1", tags=["study_modes"])
 
@@ -56,6 +54,9 @@ async def stream_mode_response(
     # RAG: retrieve relevant chunks instead of using full text
     retrieval_query = _build_retrieval_query(mode, prompt_context)
     try:
+        from app.services.reranker import RerankerService
+        from app.services.vector_store import VectorStoreService
+
         vector_store = VectorStoreService()
         retrieved = vector_store.query(
             query_text=retrieval_query,

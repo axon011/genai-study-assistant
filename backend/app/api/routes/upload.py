@@ -8,10 +8,8 @@ from app.api.schemas.upload import FileUploadResponse
 from app.config import settings
 from app.database import get_db
 from app.models.file import File as FileModel
-from app.services.chunking_service import ChunkingService
 from app.services.file_extractor import FileExtractorService
 from app.services.rate_limiter import upload_rate_limit
-from app.services.vector_store import VectorStoreService
 
 router = APIRouter(prefix="/api/v1", tags=["upload"])
 
@@ -73,6 +71,9 @@ async def upload_file(
 
     # RAG: chunk text and store embeddings in ChromaDB
     try:
+        from app.services.chunking_service import ChunkingService
+        from app.services.vector_store import VectorStoreService
+
         chunker = ChunkingService()
         chunks = chunker.chunk_text(
             text=extracted_text,
