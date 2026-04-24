@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { deleteSession, fetchSessionDetail, fetchSessions } from "./api/client";
+import { ChatView } from "./components/ChatView";
 import { CostDisplay } from "./components/CostDisplay";
 import { FileUpload } from "./components/FileUpload";
 import { FlashcardCarousel } from "./components/FlashcardCarousel";
@@ -59,14 +60,9 @@ function parseQuiz(value: string): QuizPayload | null {
 }
 
 function getModeLabel(mode: StudyMode): string {
-  if (mode === "flashcards") {
-    return "Flashcards";
-  }
-
-  if (mode === "quiz") {
-    return "Quiz";
-  }
-
+  if (mode === "flashcards") return "Flashcards";
+  if (mode === "quiz") return "Quiz";
+  if (mode === "chat") return "Chat";
   return "Summarize";
 }
 
@@ -276,7 +272,7 @@ function App() {
           {fileData && uploadState === "success" && (
             <div className="action-section">
               <div aria-label="Study modes" className="mode-tabs" role="tablist">
-                {(["summarize", "flashcards", "quiz"] as StudyMode[]).map((item) => (
+                {(["chat", "summarize", "flashcards", "quiz"] as StudyMode[]).map((item) => (
                   <button
                     aria-selected={mode === item}
                     className={`mode-tab ${mode === item ? "active" : ""}`}
@@ -290,6 +286,11 @@ function App() {
                 ))}
               </div>
 
+              {mode === "chat" && fileData && (
+                <ChatView fileId={fileData.file_id} fileName={fileData.original_filename} />
+              )}
+
+              {mode !== "chat" && (
               <textarea
                 className="instructions-input"
                 maxLength={500}
@@ -298,6 +299,7 @@ function App() {
                 rows={2}
                 value={instructions}
               />
+              )}
 
               {mode === "flashcards" && (
                 <div className="mode-controls">
@@ -370,9 +372,11 @@ function App() {
                 </div>
               )}
 
+              {mode !== "chat" && (
               <button className="btn-primary" onClick={handleGenerate} type="button">
                 Generate {getModeLabel(mode)}
               </button>
+              )}
             </div>
           )}
 

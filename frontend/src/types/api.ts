@@ -9,7 +9,7 @@ export interface FileUploadResponse {
   created_at: string;
 }
 
-export type StudyMode = "summarize" | "flashcards" | "quiz";
+export type StudyMode = "summarize" | "flashcards" | "quiz" | "chat";
 export type SessionMode = "summarize" | "flashcard" | "quiz";
 
 export interface SummarizeRequest {
@@ -101,6 +101,64 @@ export interface SessionListResponse {
   page_size: number;
   total: number;
 }
+
+export interface ChatRequest {
+  file_id: string;
+  message: string;
+  conversation_id?: string;
+}
+
+export interface ChatSource {
+  source_num: number;
+  filename: string;
+  chunk_index: number;
+  total_chunks: number;
+  file_id: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  sources?: ChatSource[] | null;
+  created_at: string;
+}
+
+export interface ConversationItem {
+  id: string;
+  title: string | null;
+  file_name: string | null;
+  message_count: number;
+  created_at: string;
+}
+
+export interface ConversationDetail {
+  id: string;
+  title: string | null;
+  file_id: string | null;
+  file_name: string | null;
+  messages: ChatMessage[];
+  created_at: string;
+}
+
+export interface ChatCompleteEvent {
+  conversation_id: string;
+  total_tokens: number;
+  total_cost: number;
+  input_tokens: number;
+  output_tokens: number;
+  sources: ChatSource[];
+}
+
+export interface ChatInitEvent {
+  conversation_id: string;
+}
+
+export type ChatSSEEvent =
+  | ({ _event: "init" } & ChatInitEvent)
+  | ({ _event: "stream" } & StreamChunkEvent)
+  | ({ _event: "complete" } & ChatCompleteEvent)
+  | ({ _event: "error" } & StreamErrorEvent);
 
 export interface SessionDetail {
   id: string;

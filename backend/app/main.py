@@ -13,6 +13,7 @@ from app.database import engine
 from app.models.base import Base
 import app.models
 
+from app.api.routes.chat import router as chat_router
 from app.api.routes.sessions import router as sessions_router
 from app.api.routes.upload import router as upload_router
 from app.api.routes.study_modes import router as study_modes_router
@@ -56,6 +57,7 @@ app.add_middleware(
 app.include_router(upload_router)
 app.include_router(study_modes_router)
 app.include_router(sessions_router)
+app.include_router(chat_router)
 
 
 @app.get("/api/v1/health")

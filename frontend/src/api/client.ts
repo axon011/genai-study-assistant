@@ -1,5 +1,9 @@
 import { API_BASE_URL } from "../config";
 import type {
+  ChatRequest,
+  ChatSSEEvent,
+  ConversationDetail,
+  ConversationItem,
   FileUploadResponse,
   FlashcardRequest,
   QuizRequest,
@@ -125,4 +129,62 @@ export async function deleteSession(sessionId: string): Promise<void> {
     const err = await response.json().catch(() => ({ detail: "Failed to delete session" }));
     throw new Error(err.detail || "Failed to delete session");
   }
+}
+
+export async function* streamChat(request: ChatRequest): AsyncGenerator<ChatSSEEvent> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ detail: "Chat request failed" }));
+    throw new Error(err.detail || "Chat request failed");
+  }
+
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error("Streaming not supported");
+
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() || "";
+
+    let currentEvent = "";
+    for (const line of lines) {
+      if (line.startsWith("event: ")) {
+        currentEvent = line.slice(7).trim();
+      } else if (line.startsWith("data: ") && currentEvent) {
+        const data = JSON.parse(line.slice(6));
+        yield { ...data, _event: currentEvent } as ChatSSEEvent;
+        currentEvent = "";
+      }
+    }
+  }
+}
+
+export async function fetchConversations(): Promise<ConversationItem[]> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/conversations`);
+  if (!response.ok) throw new Error("Failed to load conversations");
+  return response.json();
+}
+
+export async function fetchConversation(id: string): Promise<ConversationDetail> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/conversations/${id}`);
+  if (!response.ok) throw new Error("Failed to load conversation");
+  return response.json();
+}
+
+export async function deleteConversation(id: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/conversations/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) throw new Error("Failed to delete conversation");
 }

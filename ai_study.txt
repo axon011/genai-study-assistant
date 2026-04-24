@@ -1,0 +1,11 @@
+Artificial Intelligence (AI) is the simulation of human intelligence by machines. Key areas include:
+
+1. Machine Learning (ML): Systems that learn from data without explicit programming. Types include supervised learning (labeled data), unsupervised learning (pattern discovery), and reinforcement learning (reward-based).
+
+2. Natural Language Processing (NLP): Enables machines to understand and generate human language. Applications include chatbots, translation, and sentiment analysis. Key techniques: tokenization, embeddings, attention mechanisms.
+
+3. Computer Vision: Machines interpret visual information from images and videos. Uses convolutional neural networks (CNNs). Applications: facial recognition, autonomous vehicles, medical imaging.
+
+4. Deep Learning: Neural networks with multiple layers. Key architectures include Transformers (used in GPT, BERT), GANs (generative adversarial networks), and autoencoders. Requires large datasets and GPU computing.
+
+5. Reinforcement Learning: Agent learns optimal actions through trial and error. Uses reward signals to maximize cumulative reward. Applications: game playing (AlphaGo), robotics, recommendation systems.
